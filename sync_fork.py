@@ -25,9 +25,13 @@ def api(method, path, auth=True, raw=False, data=None, timeout=60):
     if data is not None:
         req.add_header('Content-Type', 'application/json')
     body = json.dumps(data).encode() if data is not None else None
-    with urllib.request.urlopen(req, timeout=timeout, data=body) as r:
-        out = r.read().decode()
-        return out if raw else json.loads(out)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout, data=body) as r:
+            out = r.read().decode()
+            return out if raw else json.loads(out)
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode(errors='replace')[:300]
+        raise SystemExit(f'API {method} {path} -> HTTP {e.code}: {detail}')
 
 def main():
     # 1) upstream file
