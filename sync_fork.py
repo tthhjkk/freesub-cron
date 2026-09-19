@@ -34,8 +34,8 @@ def api(method, path, auth=True, raw=False, data=None, timeout=60):
         raise SystemExit(f'API {method} {path} -> HTTP {e.code}: {detail}')
 
 def main():
-    # 1) upstream file
-    up = api('GET', f'/repos/{UP}/contents/scripts/main_v2.py', auth=False)
+    # 1) upstream file（带 token：runner 共享 IP 上匿名请求会撞限流）
+    up = api('GET', f'/repos/{UP}/contents/scripts/main_v2.py')
     src = base64.b64decode(up['content']).decode('utf-8')
     print(f"upstream main_v2.py sha={up['sha'][:8]} bytes={len(src)}")
 
